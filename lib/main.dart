@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_forecast/forecast/app_bar.dart';
 import 'package:flutter_forecast/forecast/background/background_with_rings.dart';
+import 'package:flutter_forecast/forecast/generic_widgets/sliding_drawer.dart';
+import 'package:flutter_forecast/forecast/week_drawer.dart';
 
 void main() => runApp(new MyApp());
 
@@ -24,7 +26,20 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
+  OpenableController openableController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    openableController = new OpenableController(
+      vsync: this,
+      openDuration: const Duration(milliseconds: 250),
+    )..addListener(() => setState(() {}));
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -35,8 +50,18 @@ class _MyHomePageState extends State<MyHomePage> {
             top: 0.0,
             left: 0.0,
             right: 0.0,
-            child: new ForecastAppBar(),
-          )
+            child: new ForecastAppBar(
+              onDrawerArrowTap: openableController.open,
+            ),
+          ),
+          new SlidingDrawer(
+            openableController: openableController,
+            drawer: new WeekDrawer(
+              onDaySelected: (String title) {
+                openableController.close();
+              },
+            ),
+          ),
         ],
       ),
     );
